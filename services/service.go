@@ -1,5 +1,9 @@
 package services
 
+/*
+
+TODO: Refactor
+
 import
 
 // Logging Functions
@@ -53,3 +57,7 @@ func (this *RequestContext) INFO(functionName string, a ...interface{}) {
 func (this *RequestContext) WARN(functionName string, a ...interface{}) {
 	tracelog.WARNcd(3, this.UUID(), "", functionName, a)
 }
+
+
+
+*/
