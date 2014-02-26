@@ -1,3 +1,5 @@
+// The httpClient package provides lower level http control for handling
+// http based messages
 package httpClient
 
 import (
@@ -99,6 +101,7 @@ func Get(url string) (resp *http.Response, err error) {
 	return resp, err
 }
 
+// Post performs a post request
 func Post(url string, postParams url.Values) ([]byte, error) {
 	tracelog.STARTEDf("http_client", "Post", "Url => %s, Post Params => %v", url, postParams)
 
@@ -113,7 +116,7 @@ func Post(url string, postParams url.Values) ([]byte, error) {
 	return loadResponse(resp)
 }
 
-//parse response
+// loadResponse parse a response
 func loadResponse(resp *http.Response) ([]byte, error) {
 	tracelog.STARTED("http_client", "loadResponse")
 

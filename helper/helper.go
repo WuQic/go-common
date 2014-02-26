@@ -1,3 +1,5 @@
+// The helper package provides generic or common functions required by
+// the application
 package helper
 
 import (
@@ -10,7 +12,8 @@ import (
 	"github.com/goinggo/tracelog"
 )
 
-//Logs a model in formatted JSON
+// LogModel writes a specified model object into the logs
+// as a formatted JSON document
 func LogModel(obj interface{}, useTrace bool) {
 	bArray, _ := json.MarshalIndent(obj, "", "    ")
 
@@ -21,7 +24,7 @@ func LogModel(obj interface{}, useTrace bool) {
 	}
 }
 
-//Merges url values from one map to another
+// MergeUrlValues merges url values from one map to another
 func MergeUrlValues(target *url.Values, source url.Values) {
 	for key, _ := range source {
 		target.Add(key, source.Get(key))

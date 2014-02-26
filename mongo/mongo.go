@@ -1,10 +1,5 @@
-// Copyright 2013 Ardan Studios. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-/*
-	This package provides mongo connectivity support
-*/
+// The mongo package provides support for accessing and executing commands against
+// a mongoDB database
 package mongo
 
 import (
@@ -274,7 +269,7 @@ func ToString(queryMap bson.M) string {
 	return string(json)
 }
 
-// ToString converts bson.D to a string
+// ToStringD converts bson.D to a string
 func ToStringD(queryMap bson.D) string {
 	json, err := json.Marshal(queryMap)
 	if err != nil {
