@@ -100,17 +100,16 @@ func (this *BaseController) ServeError(err error) {
 
 	switch e := err.(type) {
 	case *aErrors.AppError:
-		{
-			if e.ErrorCode() != 0 {
-				this.ServeMessageWithStatus(e.ErrorCode(), e.Error())
-				break
-			}
+
+		if e.ErrorCode() != 0 {
+			this.ServeMessageWithStatus(e.ErrorCode(), e.Error())
+
+		} else {
+			this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, e.Error())
 		}
+
 	default:
-		{
-			this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
-			break
-		}
+		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
 	}
 
 	return
