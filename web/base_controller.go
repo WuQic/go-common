@@ -110,8 +110,6 @@ func (this *BaseController) ServeError(err error) {
 	default:
 		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, err.Error())
 	}
-
-	return
 }
 
 // ServeAppError serves a generic application error
