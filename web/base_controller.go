@@ -108,7 +108,7 @@ func (this *BaseController) ServeError(err error) {
 		}
 	default:
 		{
-			this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, e.Error())
+			this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
 			break
 		}
 	}
