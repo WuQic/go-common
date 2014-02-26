@@ -140,5 +140,4 @@ func (this *BaseController) CatchPanic(err *error, UUID string, functionName str
 	if helper.CatchPanic(err, UUID, functionName) {
 		this.ServeAppError()
 	}
-
 }

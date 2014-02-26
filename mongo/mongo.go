@@ -204,7 +204,7 @@ func CloneMonotonicSession(sessionId string) (*mgo.Session, error) {
 	return CloneSession(sessionId, MONOTONIC_SESSION)
 }
 
-// CopySession makes a clone of the specified session for client use
+// CloneSession makes a clone of the specified session for client use
 func CloneSession(sessionId string, useSession string) (mongoSession *mgo.Session, err error) {
 	defer helper.CatchPanic(nil, sessionId, "CopySession")
 
@@ -235,6 +235,11 @@ func CloseSession(sessionId string, mongoSession *mgo.Session) {
 	mongoSession.Close()
 
 	tracelog.COMPLETED(sessionId, "CloseSession")
+}
+
+// GetDatabase returns a reference to the specified database
+func GetDatabase(mongoSession *mgo.Session, useDatabase string) *mgo.Database {
+	return mongoSession.DB(useDatabase)
 }
 
 // GetCollection returns a reference to a collection for the specified database and collection name

@@ -20,7 +20,6 @@ const key = "~*&^*lnkldfnljdf&^*)%*^%*^%ksjdlj3984mn38JL:8k3km}[71&$@@%^*())km2p
 
 //Generates a SHA256 Token from a String.
 func Hash(value string) string {
-
 	data := []byte(value)
 	hash := sha256.New()
 	hash.Write(data)
@@ -69,5 +68,4 @@ func IsTokenValid(secureEntity SecureEntity, token string) error {
 	tracelog.COMPLETED("Utils", "IsValidToken, Token Is Valid")
 
 	return nil
-
 }

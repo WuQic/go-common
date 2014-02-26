@@ -11,7 +11,6 @@ import (
 
 //Logs a model in formatted JSON
 func LogModel(obj interface{}, useTrace bool) {
-
 	bArray, _ := json.MarshalIndent(obj, "", "    ")
 
 	if useTrace {
@@ -19,7 +18,6 @@ func LogModel(obj interface{}, useTrace bool) {
 	} else {
 		tracelog.INFO("utils", "LogModel", "Obj => \n\n%s\n\n", string(bArray))
 	}
-
 }
 
 //Merges url values from one map to another
