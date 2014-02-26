@@ -1,7 +1,9 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/ArdanStudios/go-common/errors"
 	"github.com/ArdanStudios/go-common/helper"
@@ -89,6 +91,19 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 	this.ServeJson()
 }
 
+// ServerValidationErrorMessages is used to return an error validation response
+func (this *BaseController) ServerValidationErrorMessages(validationErrors []string) {
+	this.Ctx.Output.SetStatus(errors.VALIDATION_ERROR_CODE)
+
+	if tracelog.LogLevel() == tracelog.LEVEL_TRACE {
+		json, _ := json.MarshalIndent(validationErrors, "", "    ")
+		tracelog.TRACE("SYSTEM", "ValidationResponse", "\n%s\n", string(json))
+	}
+
+	this.Data["json"] = validationErrors
+	this.ServeJson()
+}
+
 func (this *BaseController) ServeApplicationError(appErr *errors.AppError) {
 	tracelog.INFO("BaseController", "ServeApplicationError", "Application Error, Exiting")
 
@@ -127,7 +142,28 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 	}
 
 	if ok == false {
-		this.ServeValidationErrors(valid.Errors)
+		// Build a map of the error messages
+		messages2 := map[string]string{}
+		val := reflect.ValueOf(params).Elem()
+		for i := 0; i < val.NumField(); i++ {
+			typeField := val.Type().Field(i)
+			tag := typeField.Tag
+			tagValue := tag.Get("error")
+			messages2[typeField.Name] = tagValue
+		}
+
+		// Build the error response
+		errors := []string{}
+		for _, err := range valid.Errors {
+			message, ok := messages2[err.Field]
+			if ok == true {
+				errors = append(errors, message)
+			} else {
+				errors = append(errors, err.Message)
+			}
+		}
+
+		this.ServerValidationErrorMessages(errors)
 		return false
 	}
 
