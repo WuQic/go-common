@@ -1,5 +1,5 @@
 // The errors package provides support for application specific error handling
-package errors
+package appErrors
 
 const (
 	VALIDATION_ERROR_MSG  = "Validation Error: The parameters provided were invalid."
@@ -45,9 +45,4 @@ func NewError(error string, code int) error {
 // NewValidationError creates an AppError object for a validation error
 func NewValidationError(error string) error {
 	return &AppError{ErrorMsg: error, Code: VALIDATION_ERROR_CODE}
-}
-
-// NewAppError creates an AppError object for an error exception
-func NewAppError(err error) error {
-	return &AppError{ErrorMsg: err.Error(), Code: APP_ERROR_CODE}
 }
