@@ -96,7 +96,7 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 
 // ServeError serves a error interface object.
 func (this *BaseController) ServeError(err error) {
-	tracelog.INFO("BaseController", "ServeApplicationError", "Application Error, Exiting")
+	tracelog.INFO("BaseController", "ServeError", "Application Error, Exiting")
 
 	switch e := err.(type) {
 	case *aErrors.AppError:
@@ -113,6 +113,26 @@ func (this *BaseController) ServeError(err error) {
 	}
 
 	return
+}
+
+// ServeErrorResponse serves an error interface object
+func (this *BaseController) ServeErrorResponse(err error) {
+	tracelog.INFO("BaseController", "ServeErrorResponse", "Application Error, Exiting")
+
+	switch e := err.(type) {
+	case *aErrors.AppError:
+		if e.ErrorCode() != 0 {
+			this.ServeMessageWithStatus(e.ErrorCode(), e.Error())
+			return
+		}
+
+		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, e.Error())
+		return
+
+	default:
+		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
+		return
+	}
 }
 
 // ServeAppError serves a generic application error
