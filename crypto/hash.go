@@ -1,3 +1,4 @@
+// The crypto package provides primative and application specific crypto support
 package crypto
 
 import (
@@ -11,6 +12,8 @@ import (
 )
 
 type (
+	// SecureEntity interface is required for processing
+	// and validating tokens
 	SecureEntity interface {
 		TokenBytes() ([]byte, error)
 	}
@@ -18,7 +21,7 @@ type (
 
 const key = "~*&^*lnkldfnljdf&^*)%*^%*^%ksjdlj3984mn38JL:8k3km}[71&$@@%^*())km2pumsdjgmHJGSL:JHFdkjfj(&%#$22)=="
 
-//Generates a SHA256 Token from a String.
+// Hash generates a SHA256 Token from a String.
 func Hash(value string) string {
 	data := []byte(value)
 	hash := sha256.New()
@@ -27,12 +30,12 @@ func Hash(value string) string {
 	return hex.EncodeToString(md)
 }
 
-//Generates a Signed SHA256 Hash and then encodes it to Base64
+// SignedEncodedHash generates a Signed SHA256 Hash and then encodes it to Base64
 func SignedEncodedHash(message string, keyString string) string {
 	return base64.StdEncoding.EncodeToString(SignedHash(message, keyString))
 }
 
-//Generates a Signed SHA256 Hash
+// SignedHash generates a Signed SHA256 Hash
 func SignedHash(message string, keyToSign string) []byte {
 	if keyToSign == "" {
 		tracelog.TRACE("go-common/crypto", "SignedHash", "KeyString is Blank")
@@ -44,7 +47,7 @@ func SignedHash(message string, keyToSign string) []byte {
 	return h.Sum(nil)
 }
 
-//Checks whether a token is valid for a Secure Entity.
+// IsTokenValid checks whether a token is valid for a Secure Entity.
 func IsTokenValid(secureEntity SecureEntity, token string) error {
 	tracelog.STARTED("Utils", "IsValidToken")
 

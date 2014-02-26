@@ -1,3 +1,5 @@
+// The decoder package provides support for decoding JSON documents
+// into Go native types that have the appropriate tags
 package decoder
 
 import (
@@ -9,6 +11,8 @@ import (
 	"github.com/goinggo/tracelog"
 )
 
+// IsArrayResponse validates if the specified JSON document
+// is an array or slice
 func IsArrayResponse(doc []byte) bool {
 	tracelog.STARTED("utils", "IsArrayResponse")
 
@@ -25,7 +29,7 @@ func IsArrayResponse(doc []byte) bool {
 	return false
 }
 
-//Decodes a json document, with a stuct into struct
+// DecodeMap decodes a JSON document into a Go native object
 func DecodeMap(docMap map[string]interface{}, obj interface{}) error {
 	if err := mapstructure.DecodePath(docMap, obj); err != nil {
 		tracelog.ERROR(err, "utils", "Decode, Decoding Mapped Doc")
@@ -39,9 +43,8 @@ func DecodeMap(docMap map[string]interface{}, obj interface{}) error {
 	return nil
 }
 
-//Decodes a json document, with a stuct into struct
+// Decode takes a JSON document and decodes that into a Go native object
 func Decode(doc []byte, obj interface{}) error {
-
 	tracelog.STARTED("utils", "Decode")
 	docMap := map[string]interface{}{}
 
@@ -53,7 +56,7 @@ func Decode(doc []byte, obj interface{}) error {
 	return DecodeMap(docMap, obj)
 }
 
-//Decodes a json array document into a slice of structs
+// DecodeSlice decodes a JSON document array into a slice of Go native objects
 func DecodeSlice(doc []byte, sliceObj interface{}, obj interface{}) (bool, error) {
 	tracelog.STARTED("utils", "DecodeSlice")
 
