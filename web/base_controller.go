@@ -105,7 +105,6 @@ func (this *BaseController) ServeAppError() {
 }
 
 func (this *BaseController) ServeMessageWithStatus(status int, msg string) {
-
 	this.Ctx.Output.SetStatus(status)
 	msgs := MessageResponse{}
 	msgs.Messages = []string{msg}
