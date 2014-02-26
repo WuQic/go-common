@@ -2,7 +2,6 @@
 package web
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -101,7 +100,7 @@ func (this *BaseController) ServeError(err error) {
 	switch e := err.(type) {
 	case *aErrors.AppError:
 		{
-			if e.ErrorCode() == 0 {
+			if e.ErrorCode() != 0 {
 				this.ServeMessageWithStatus(e.ErrorCode(), e.Error())
 				break
 			}
