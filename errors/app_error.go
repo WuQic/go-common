@@ -46,3 +46,8 @@ func NewError(error string, code int) error {
 func NewValidationError(error string) error {
 	return &AppError{ErrorMsg: error, Code: VALIDATION_ERROR_CODE}
 }
+
+// NewAppError creates an AppError object for an error exception
+func NewAppError(err error) error {
+	return &AppError{ErrorMsg: err.Error(), Code: APP_ERROR_CODE}
+}
