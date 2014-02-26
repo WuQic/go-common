@@ -117,7 +117,7 @@ func (this *BaseController) ServeError(err error) {
 
 // ServeErrorResponse serves an error interface object
 func (this *BaseController) ServeErrorResponse(err error) {
-	tracelog.INFO("BaseController", "ServeErrorResponse", "Application Error, Exiting")
+	tracelog.INFO("BaseController", "ServeErrorResponse", "Application Error, Exiting : %s", err)
 
 	switch e := err.(type) {
 	case *aErrors.AppError:
@@ -130,7 +130,7 @@ func (this *BaseController) ServeErrorResponse(err error) {
 		return
 
 	default:
-		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
+		this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, err.Error())
 		return
 	}
 }
