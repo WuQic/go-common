@@ -163,9 +163,10 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 			message, ok := messages2[err.Field]
 			if ok == true {
 				errors = append(errors, message)
-			} else {
-				errors = append(errors, err.Message)
+				continue
 			}
+
+			errors = append(errors, err.Message)
 		}
 
 		this.ServeMessagesWithStatus(aErrors.VALIDATION_ERROR_CODE, errors)
