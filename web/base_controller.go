@@ -79,7 +79,7 @@ func (this *BaseController) ServeValidationError() {
 	this.ServeJson()
 }
 
-//ServeValidationError returns a Validation Error's list of messages with a validation err code.
+// ServeValidationErrors returns a Validation Error's list of messages with a validation err code.
 func (this *BaseController) ServeValidationErrors(validationErrors []*validation.ValidationError) {
 	this.Ctx.Output.SetStatus(aErrors.VALIDATION_ERROR_CODE)
 
@@ -94,6 +94,7 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 	this.ServeJson()
 }
 
+// ServeError serves a error interface object.
 func (this *BaseController) ServeError(err error) {
 	tracelog.INFO("BaseController", "ServeApplicationError", "Application Error, Exiting")
 
@@ -125,10 +126,14 @@ func (this *BaseController) ServeAppError() {
 
 // ServeMessageWithStatus serves a HTTP status and message
 func (this *BaseController) ServeMessageWithStatus(status int, msg string) {
+	this.ServeMessagesWithStatus(status, []string{msg})
+}
+
+// ServeMessageWithStatus serves a HTTP status and messages
+func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 	this.Ctx.Output.SetStatus(status)
-	msgs := MessageResponse{}
-	msgs.Messages = []string{msg}
-	this.Data["json"] = &msgs
+	response := MessageResponse{Messages: msgs}
+	this.Data["json"] = &response
 	this.ServeJson()
 }
 
@@ -169,7 +174,7 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 			}
 		}
 
-		this.ServerValidationErrorMessages(errors)
+		this.ServeMessagesWithStatus(aErrors.VALIDATION_ERROR_CODE, errors)
 		return false
 	}
 
