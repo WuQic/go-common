@@ -266,6 +266,7 @@ func ToString(queryMap bson.M) string {
 	if err != nil {
 		return ""
 	}
+
 	return string(json)
 }
 
@@ -275,6 +276,7 @@ func ToStringD(queryMap bson.D) string {
 	if err != nil {
 		return ""
 	}
+
 	return string(json)
 }
 
@@ -299,6 +301,5 @@ func Execute(sessionId string, mongoSession *mgo.Session, databaseName string, c
 	}
 
 	tracelog.COMPLETED(sessionId, "Execute")
-
 	return err
 }

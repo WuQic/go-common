@@ -69,6 +69,5 @@ func IsTokenValid(secureEntity SecureEntity, token string) error {
 	}
 
 	tracelog.COMPLETED("Utils", "IsValidToken, Token Is Valid")
-
 	return nil
 }

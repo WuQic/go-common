@@ -25,7 +25,6 @@ func IsArrayResponse(doc []byte) bool {
 	}
 
 	tracelog.COMPLETEDf("utils", "IsArrayResponse", "Doc is not Array")
-
 	return false
 }
 
@@ -66,6 +65,7 @@ func DecodeSlice(doc []byte, sliceObj interface{}, obj interface{}) (bool, error
 			tracelog.ERROR(err, "utils", "DecodeSlice, Item Not Array, Unable to decode as struct")
 			return false, err
 		}
+
 		//return false since not an array
 		return false, nil
 	}

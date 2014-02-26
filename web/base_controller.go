@@ -66,7 +66,6 @@ func (this *BaseController) ServeUnAuthorized() {
 	tracelog.INFO("BaseController", "ServeUnAuthorized", "UnAuthorized, Exiting")
 
 	this.ServeMessageWithStatus(aErrors.UNAUTHORIZED_ERROR_CODE, aErrors.UNAUTHORIZED_ERROR_MSG)
-	return
 }
 
 // ServeValidationError returns a Validation Error's list of messages with a validation err code.
@@ -117,7 +116,6 @@ func (this *BaseController) ServeAppError() {
 	tracelog.INFO("BaseController", "ServeAppError", "Application Error, Exiting")
 
 	this.ServeMessageWithStatus(aErrors.APP_ERROR_CODE, aErrors.APP_ERROR_MSG)
-	return
 }
 
 // ServeMessageWithStatus serves a HTTP status and message
