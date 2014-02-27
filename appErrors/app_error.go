@@ -51,11 +51,6 @@ func NewValidationError(error string) error {
 	return &AppError{ErrorMsg: error, Code: VALIDATION_ERROR_CODE}
 }
 
-// Errorf creates an AppError based app error from the formatted string
-func Errorf(format string, a ...interface{}) error {
-	return NewError(fmt.Sprintf(format, a), APP_ERROR_CODE)
-}
-
 // ErrorValf creates an AppError based validation error from the formatted string
 func ErrorValf(format string, a ...interface{}) error {
 	return NewError(fmt.Sprintf(format, a), VALIDATION_ERROR_CODE)

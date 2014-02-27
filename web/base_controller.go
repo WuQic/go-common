@@ -95,8 +95,6 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 
 // ServeError serves a error interface object
 func (this *BaseController) ServeError(err error) {
-	tracelog.INFO("BaseController", "ServeError", "Application Error, Exiting : %s", err)
-
 	switch e := err.(type) {
 	case *appErrors.AppError:
 		if e.ErrorCode() != 0 {
@@ -111,10 +109,13 @@ func (this *BaseController) ServeError(err error) {
 	}
 }
 
+// ServeValErrorf serves a error interface object
+func (this *BaseController) ServeValErrorf(format string, a ...interface{}) {
+	this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, fmt.Sprintf(format, a))
+}
+
 // ServeAppError serves a generic application error
 func (this *BaseController) ServeAppError() {
-	tracelog.INFO("BaseController", "ServeAppError", "Application Error, Exiting")
-
 	this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, appErrors.APP_ERROR_MSG)
 }
 
@@ -125,6 +126,8 @@ func (this *BaseController) ServeMessageWithStatus(status int, msg string) {
 
 // ServeMessageWithStatus serves a HTTP status and messages
 func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
+	tracelog.INFO("BaseController", "ServeMessagesWithStatus", "Application Error, Exiting : %#v", msgs)
+
 	this.Ctx.Output.SetStatus(status)
 	response := MessageResponse{Messages: msgs}
 	this.Data["json"] = &response
