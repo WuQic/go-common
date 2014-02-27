@@ -154,13 +154,16 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 	}
 
 	if ok == false {
-		// Build a map of the error messages
+		// Build a map of the error messages for each field
 		messages2 := map[string]string{}
 		val := reflect.ValueOf(params).Elem()
 		for i := 0; i < val.NumField(); i++ {
+			// Look for an error tag in the field
 			typeField := val.Type().Field(i)
 			tag := typeField.Tag
 			tagValue := tag.Get("error")
+
+			// Was there an error tag
 			if tagValue != "" {
 				messages2[typeField.Name] = tagValue
 			}
@@ -169,12 +172,16 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 		// Build the error response
 		errors := []string{}
 		for _, err := range valid.Errors {
+			// Match an error from the validation framework errors
+			// to a field name we have a mapping for
 			message, ok := messages2[err.Field]
 			if ok == true {
+				// Use a localized message if one exists
 				errors = append(errors, localize.T(message))
 				continue
 			}
 
+			// No match, so use the message as is
 			errors = append(errors, err.Message)
 		}
 
