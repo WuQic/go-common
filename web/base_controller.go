@@ -7,6 +7,7 @@ import (
 
 	"github.com/ArdanStudios/go-common/appErrors"
 	"github.com/ArdanStudios/go-common/helper"
+	"github.com/ArdanStudios/go-common/messages"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/validation"
 	"github.com/goinggo/tracelog"
@@ -65,7 +66,7 @@ func (this *BaseController) ServeJsonWithCache(obj interface{}, secondsToCache i
 func (this *BaseController) ServeUnAuthorized() {
 	tracelog.INFO("BaseController", "ServeUnAuthorized", "UnAuthorized, Exiting")
 
-	this.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, appErrors.UNAUTHORIZED_ERROR_MSG)
+	this.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, messages.T(appErrors.UNAUTHORIZED_ERROR_MSG))
 }
 
 // ServeValidationError returns a Validation Error's list of messages with a validation err code
@@ -73,7 +74,7 @@ func (this *BaseController) ServeValidationError() {
 	this.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
 	msgs := MessageResponse{}
-	msgs.Messages = []string{appErrors.VALIDATION_ERROR_MSG}
+	msgs.Messages = []string{messages.T(appErrors.VALIDATION_ERROR_MSG)}
 	this.Data["json"] = &msgs
 	this.ServeJson()
 }
@@ -105,18 +106,21 @@ func (this *BaseController) ServeError(err error) {
 		this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, e.Error())
 
 	default:
-		this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, appErrors.APP_ERROR_MSG)
+		// We want to always return a generic message when an application error exists
+		// We don't want to give the end user any information they could use against us
+		this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, messages.T(appErrors.APP_ERROR_MSG))
 	}
 }
 
-// ServeValErrorf serves a error interface object
-func (this *BaseController) ServeValErrorf(format string, a ...interface{}) {
-	this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, fmt.Sprintf(format, a))
+// ServeLocalizedError serves a validation error based on the specified key for the
+// translated message
+func (this *BaseController) ServeLocalizedError(key string) {
+	this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, messages.T(key))
 }
 
 // ServeAppError serves a generic application error
 func (this *BaseController) ServeAppError() {
-	this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, appErrors.APP_ERROR_MSG)
+	this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, messages.T(appErrors.APP_ERROR_MSG))
 }
 
 // ServeMessageWithStatus serves a HTTP status and message
@@ -138,14 +142,14 @@ func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 func (this *BaseController) ParseAndValidate(params interface{}) bool {
 	err := this.ParseForm(params)
 	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, appErrors.VALIDATION_ERROR_MSG)
+		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, messages.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 
 	valid := validation.Validation{}
 	ok, err := valid.Valid(params)
 	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, appErrors.VALIDATION_ERROR_MSG)
+		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, messages.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 

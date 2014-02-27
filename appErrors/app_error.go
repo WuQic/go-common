@@ -6,13 +6,13 @@ import (
 )
 
 const (
-	VALIDATION_ERROR_MSG  = "Validation Error: The parameters provided were invalid."
+	VALIDATION_ERROR_MSG  = "validation_error"
 	VALIDATION_ERROR_CODE = 409
 
-	UNAUTHORIZED_ERROR_MSG  = "Invalid Credentials were supplied."
+	UNAUTHORIZED_ERROR_MSG  = "invalid_credentials"
 	UNAUTHORIZED_ERROR_CODE = 401
 
-	APP_ERROR_MSG  = "An Application Error has occured."
+	APP_ERROR_MSG  = "application_error"
 	APP_ERROR_CODE = 500
 
 	CACHE_CONTROL_HEADER = "Cache-control"
