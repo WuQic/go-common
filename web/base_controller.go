@@ -169,7 +169,7 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 		for _, err := range valid.Errors {
 			message, ok := messages2[err.Field]
 			if ok == true {
-				errors = append(errors, message)
+				errors = append(errors, localize.T(message))
 				continue
 			}
 
