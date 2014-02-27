@@ -3,13 +3,17 @@
 package localize
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
 
+	loc "github.com/ArdanStudios/go-common/i18n"
 	"github.com/goinggo/tracelog"
 	"github.com/nicksnyder/go-i18n/i18n"
+	"github.com/nicksnyder/go-i18n/i18n/locale"
+	"github.com/nicksnyder/go-i18n/i18n/translation"
 )
 
 var (
@@ -18,17 +22,54 @@ var (
 	T i18n.TranslateFunc
 )
 
-// Load looks for i18n folders inside the current directory and the GOPATH
-// to find translation files to load
-func Load(userLocale string, defaultLocal string) error {
-	gopath := os.Getenv("GOPATH")
-	pwd, err := os.Getwd()
+// Init initializes the local environment
+func Init(userLocale string) {
+	switch userLocale {
+	default:
+		LoadJSON(userLocale, loc.En_US)
+	}
+}
+
+// LoadTransactionDocument takes a json document of translations and manually
+// loads them into the system
+func LoadJSON(userLocale string, translationDocument string) error {
+	tranDocuments := []map[string]interface{}{}
+	err := json.Unmarshal([]byte(translationDocument), &tranDocuments)
 	if err != nil {
-		tracelog.COMPLETED_ERROR(err, "messages", "Load")
+		tracelog.COMPLETED_ERROR(err, "localize", "LoadJSON")
 		return err
 	}
 
-	tracelog.INFO("messages", "Load", "PWD[%s] GOPATH[%s]", pwd, gopath)
+	for _, tranDocument := range tranDocuments {
+		tran, err := translation.NewTranslation(tranDocument)
+		if err != nil {
+			tracelog.COMPLETED_ERROR(err, "localize", "LoadJSON")
+			return err
+		}
+
+		i18n.AddTranslation(locale.MustNew(userLocale), tran)
+	}
+
+	// Create a translation function for use
+	T, err = i18n.Tfunc(userLocale, userLocale)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// LoadFiles looks for i18n folders inside the current directory and the GOPATH
+// to find translation files to load
+func LoadFiles(userLocale string, defaultLocal string) error {
+	gopath := os.Getenv("GOPATH")
+	pwd, err := os.Getwd()
+	if err != nil {
+		tracelog.COMPLETED_ERROR(err, "localize", "LoadFiles")
+		return err
+	}
+
+	tracelog.INFO("localize", "LoadFiles", "PWD[%s] GOPATH[%s]", pwd, gopath)
 
 	// Load any translation files we can find
 	searchDirectory(pwd, pwd)
@@ -51,7 +92,7 @@ func searchDirectory(directory string, pwd string) {
 	// Read the directory
 	fileInfos, err := ioutil.ReadDir(directory)
 	if err != nil {
-		tracelog.COMPLETED_ERROR(err, "messages", "searchDirectory")
+		tracelog.COMPLETED_ERROR(err, "localize", "searchDirectory")
 		return
 	}
 
@@ -84,7 +125,7 @@ func loadTranslationFiles(directory string) {
 	// Read the directory
 	fileInfos, err := ioutil.ReadDir(directory)
 	if err != nil {
-		tracelog.COMPLETED_ERROR(err, "messages", "loadTranslationFiles")
+		tracelog.COMPLETED_ERROR(err, "localize", "loadTranslationFiles")
 		return
 	}
 
@@ -96,7 +137,7 @@ func loadTranslationFiles(directory string) {
 
 		fileName := fmt.Sprintf("%s/%s", directory, fileInfo.Name())
 
-		tracelog.INFO("messages", "loadTranslationFiles", "Loading %s", fileName)
+		tracelog.INFO("localize", "loadTranslationFiles", "Loading %s", fileName)
 		i18n.MustLoadTranslationFile(fileName)
 	}
 }
