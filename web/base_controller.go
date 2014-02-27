@@ -2,7 +2,9 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"reflect"
 
 	"github.com/ArdanStudios/go-common/appErrors"
@@ -30,9 +32,21 @@ const (
 	CACHE_CONTROL_HEADER = "Cache-control"
 )
 
-// CacheOutput outputs the cache control headrer for seconds passed in
+// CacheOutput outputs the cache control header for seconds passed in
 func (this *BaseController) CacheOutput(seconds int64) {
 	this.Ctx.Output.Header(CACHE_CONTROL_HEADER, fmt.Sprintf("private, must-revalidate, max-age=%d", seconds))
+}
+
+// ParseBody parses the http body and decodes it into the a type.
+func (this *BaseController) ParseBody(body io.Reader, obj interface{}) error {
+	decoder := json.NewDecoder(body)
+	err := decoder.Decode(obj)
+	if err != nil {
+		tracelog.ERRORf(err, "go-common/web", "ParseBody", "Error Parsing JSON")
+		return err
+	}
+
+	return nil
 }
 
 // ServeBlankModel serves an empty key/value pair map as Json
