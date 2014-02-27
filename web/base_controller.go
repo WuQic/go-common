@@ -4,7 +4,6 @@ package web
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"reflect"
 
 	"github.com/ArdanStudios/go-common/appErrors"
@@ -35,18 +34,6 @@ const (
 // CacheOutput outputs the cache control header for seconds passed in
 func (this *BaseController) CacheOutput(seconds int64) {
 	this.Ctx.Output.Header(CACHE_CONTROL_HEADER, fmt.Sprintf("private, must-revalidate, max-age=%d", seconds))
-}
-
-// ParseBody parses the http body and decodes it into the a type.
-func (this *BaseController) ParseBody(body io.Reader, obj interface{}) error {
-	decoder := json.NewDecoder(body)
-	err := decoder.Decode(obj)
-	if err != nil {
-		tracelog.ERRORf(err, "go-common/web", "ParseBody", "Error Parsing JSON")
-		return err
-	}
-
-	return nil
 }
 
 // ServeBlankModel serves an empty key/value pair map as Json
@@ -153,7 +140,62 @@ func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 }
 
 // ParseAndValidate is used to parse any form and query parameters from the request and validate the values
-func (this *BaseController) ParseAndValidate(params interface{}) bool {
+func (this *BaseController) ParseAndValidate(obj interface{}) bool {
+	decoder := json.NewDecoder(this.Ctx.Request.Body)
+	err := decoder.Decode(obj)
+	if err != nil {
+		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
+		return false
+	}
+
+	valid := validation.Validation{}
+	ok, err := valid.Valid(obj)
+	if err != nil {
+		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
+		return false
+	}
+
+	if ok == false {
+		// Build a map of the error messages for each field
+		messages2 := map[string]string{}
+		val := reflect.ValueOf(obj).Elem()
+		for i := 0; i < val.NumField(); i++ {
+			// Look for an error tag in the field
+			typeField := val.Type().Field(i)
+			tag := typeField.Tag
+			tagValue := tag.Get("error")
+
+			// Was there an error tag
+			if tagValue != "" {
+				messages2[typeField.Name] = tagValue
+			}
+		}
+
+		// Build the error response
+		errors := []string{}
+		for _, err := range valid.Errors {
+			// Match an error from the validation framework errors
+			// to a field name we have a mapping for
+			message, ok := messages2[err.Field]
+			if ok == true {
+				// Use a localized message if one exists
+				errors = append(errors, localize.T(message))
+				continue
+			}
+
+			// No match, so use the message as is
+			errors = append(errors, err.Message)
+		}
+
+		this.ServeMessagesWithStatus(appErrors.VALIDATION_ERROR_CODE, errors)
+		return false
+	}
+
+	return true
+}
+
+// ParseAndValidate is used to parse any form and query parameters from the request and validate the values
+func (this *BaseController) ParseAndValidate2(params interface{}) bool {
 	err := this.ParseForm(params)
 	if err != nil {
 		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
