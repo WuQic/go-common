@@ -1,6 +1,10 @@
 // The appErrors package provides support for application specific error handling
 package appErrors
 
+import (
+	"fmt"
+)
+
 const (
 	VALIDATION_ERROR_MSG  = "Validation Error: The parameters provided were invalid."
 	VALIDATION_ERROR_CODE = 409
@@ -45,4 +49,14 @@ func NewError(error string, code int) error {
 // NewValidationError creates an AppError object for a validation error
 func NewValidationError(error string) error {
 	return &AppError{ErrorMsg: error, Code: VALIDATION_ERROR_CODE}
+}
+
+// Errorf creates an AppError based app error from the formatted string
+func Errorf(format string, a ...interface{}) error {
+	return NewError(fmt.Sprintf(format, a), APP_ERROR_CODE)
+}
+
+// ErrorValf creates an AppError based validation error from the formatted string
+func ErrorValf(format string, a ...interface{}) error {
+	return NewError(fmt.Sprintf(format, a), VALIDATION_ERROR_CODE)
 }
