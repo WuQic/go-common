@@ -1,6 +1,6 @@
 // The messages package looks for i18n folders within the current
 // directory and GOPATH and loads them into the system
-package messages
+package localize
 
 import (
 	"fmt"
