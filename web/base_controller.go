@@ -161,7 +161,9 @@ func (this *BaseController) ParseAndValidate(params interface{}) bool {
 			typeField := val.Type().Field(i)
 			tag := typeField.Tag
 			tagValue := tag.Get("error")
-			messages2[typeField.Name] = tagValue
+			if tagValue != "" {
+				messages2[typeField.Name] = tagValue
+			}
 		}
 
 		// Build the error response
