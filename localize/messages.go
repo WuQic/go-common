@@ -14,7 +14,7 @@ import (
 
 var (
 	// T is the translate function for the specified user
-	// locale and default locale specified durin the load
+	// locale and default locale specified during the load
 	T i18n.TranslateFunc
 )
 
