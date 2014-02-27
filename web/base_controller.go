@@ -1,4 +1,4 @@
-// The Base Controller package provides common functionality for all controllers
+// The Web package provides common functionality for all controllers
 package web
 
 import (
@@ -68,7 +68,7 @@ func (this *BaseController) ServeUnAuthorized() {
 	this.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, appErrors.UNAUTHORIZED_ERROR_MSG)
 }
 
-// ServeValidationError returns a Validation Error's list of messages with a validation err code.
+// ServeValidationError returns a Validation Error's list of messages with a validation err code
 func (this *BaseController) ServeValidationError() {
 	this.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
@@ -78,7 +78,7 @@ func (this *BaseController) ServeValidationError() {
 	this.ServeJson()
 }
 
-// ServeValidationErrors returns a Validation Error's list of messages with a validation err code.
+// ServeValidationErrors returns a Validation Error's list of messages with a validation err code
 func (this *BaseController) ServeValidationErrors(validationErrors []*validation.ValidationError) {
 	this.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
@@ -93,7 +93,7 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 	this.ServeJson()
 }
 
-// ServeError serves a error interface object.
+// ServeError serves a error interface object
 func (this *BaseController) ServeError(err error) {
 	tracelog.INFO("BaseController", "ServeError", "Application Error, Exiting : %s", err)
 

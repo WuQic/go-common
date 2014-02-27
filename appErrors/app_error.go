@@ -1,4 +1,4 @@
-// The errors package provides support for application specific error handling
+// The appErrors package provides support for application specific error handling
 package appErrors
 
 const (
