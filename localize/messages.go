@@ -31,9 +31,9 @@ func Load(userLocale string, defaultLocal string) error {
 	tracelog.INFO("messages", "Load", "PWD[%s] GOPATH[%s]", pwd, gopath)
 
 	// Load any translation files we can find
-	searchDirectory(pwd)
+	searchDirectory(pwd, pwd)
 	if gopath != "" {
-		searchDirectory(gopath)
+		searchDirectory(gopath, pwd)
 	}
 
 	// Create a translation function for use
@@ -47,7 +47,7 @@ func Load(userLocale string, defaultLocal string) error {
 
 // searchDirectory recurses through the specified directory looking
 // for i18n folders. If found it will load the translations files
-func searchDirectory(directory string) {
+func searchDirectory(directory string, pwd string) {
 	// Read the directory
 	fileInfos, err := ioutil.ReadDir(directory)
 	if err != nil {
@@ -58,14 +58,21 @@ func searchDirectory(directory string) {
 	// Look for i18n folders
 	for _, fileInfo := range fileInfos {
 		if fileInfo.IsDir() == true {
+			fullPath := fmt.Sprintf("%s/%s", directory, fileInfo.Name())
+
+			// If this directory is the current directory, ignore it
+			if fullPath == pwd {
+				continue
+			}
+
 			// Is this an i18n folder
 			if fileInfo.Name() == "i18n" {
-				loadTranslationFiles(fmt.Sprintf("%s/%s", directory, fileInfo.Name()))
+				loadTranslationFiles(fullPath)
 				continue
 			}
 
 			// Look for more sub-directories
-			searchDirectory(fmt.Sprintf("%s/%s", directory, fileInfo.Name()))
+			searchDirectory(fullPath, pwd)
 			continue
 		}
 	}
