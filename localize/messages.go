@@ -23,20 +23,31 @@ var (
 )
 
 // Init initializes the local environment
-func Init(userLocale string) error {
-	switch userLocale {
+func Init(defaultLocale string) error {
+	switch defaultLocale {
 	default:
-		LoadJSON(userLocale, loc.En_US)
+		LoadJSON(defaultLocale, loc.En_US)
 	}
 
-	// Create a translation function for use
+	// Create the default translation function for use
 	var err error
-	T, err = i18n.Tfunc(userLocale, userLocale)
+	T, err = CreateTranslationFunction(defaultLocale, defaultLocale)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// CreateTranslationFunction creates a translation function object for the
+// specified locales
+func CreateTranslationFunction(userLocale string, defaultLocale string) (t i18n.TranslateFunc, err error) {
+	t, err = i18n.Tfunc(userLocale, userLocale)
+	if err != nil {
+		return t, err
+	}
+
+	return t, err
 }
 
 // LoadTransactionDocument takes a json document of translations and manually
