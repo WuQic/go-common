@@ -47,6 +47,7 @@ func (this *ViewHelper) FormatDate(value time.Time) string {
 	if viewTime == "0000-12-31 20:00:00" {
 		return ""
 	}
+
 	return viewTime
 }
 
