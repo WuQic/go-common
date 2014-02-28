@@ -139,8 +139,8 @@ func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 	this.ServeJson()
 }
 
-// ParseAndValidate is used to parse any form and query parameters from the request and validate the values
-func (this *BaseController) ParseAndValidate(obj interface{}) bool {
+// ParseAndValidateJson is used to parse json into a type from the request and validate the values
+func (this *BaseController) ParseAndValidateJson(obj interface{}) bool {
 	decoder := json.NewDecoder(this.Ctx.Request.Body)
 	err := decoder.Decode(obj)
 	if err != nil {
@@ -148,60 +148,22 @@ func (this *BaseController) ParseAndValidate(obj interface{}) bool {
 		return false
 	}
 
-	valid := validation.Validation{}
-	ok, err := valid.Valid(obj)
-	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
-		return false
-	}
-
-	if ok == false {
-		// Build a map of the error messages for each field
-		messages2 := map[string]string{}
-		val := reflect.ValueOf(obj).Elem()
-		for i := 0; i < val.NumField(); i++ {
-			// Look for an error tag in the field
-			typeField := val.Type().Field(i)
-			tag := typeField.Tag
-			tagValue := tag.Get("error")
-
-			// Was there an error tag
-			if tagValue != "" {
-				messages2[typeField.Name] = tagValue
-			}
-		}
-
-		// Build the error response
-		errors := []string{}
-		for _, err := range valid.Errors {
-			// Match an error from the validation framework errors
-			// to a field name we have a mapping for
-			message, ok := messages2[err.Field]
-			if ok == true {
-				// Use a localized message if one exists
-				errors = append(errors, localize.T(message))
-				continue
-			}
-
-			// No match, so use the message as is
-			errors = append(errors, err.Message)
-		}
-
-		this.ServeMessagesWithStatus(appErrors.VALIDATION_ERROR_CODE, errors)
-		return false
-	}
-
-	return true
+	return this.Validate(obj)
 }
 
 // ParseAndValidate is used to parse any form and query parameters from the request and validate the values
-func (this *BaseController) ParseAndValidate2(params interface{}) bool {
-	err := this.ParseForm(params)
+func (this *BaseController) ParseAndValidate(obj interface{}) bool {
+	err := this.ParseForm(obj)
 	if err != nil {
 		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 
+	return this.Validate(obj)
+}
+
+// Validate validates a type against the valid tags in the type
+func (this *BaseController) Validate(params interface{}) bool {
 	valid := validation.Validation{}
 	ok, err := valid.Valid(params)
 	if err != nil {
