@@ -53,5 +53,5 @@ func NewValidationError(error string) error {
 
 // Errorf creates a validation AppError based on the formatted string
 func Errorf(format string, a ...interface{}) error {
-	return NewError(fmt.Sprintf(format, a), VALIDATION_ERROR_CODE)
+	return NewError(fmt.Sprintf(format, a...), VALIDATION_ERROR_CODE)
 }
