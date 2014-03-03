@@ -23,7 +23,7 @@ type (
 	// MessageResponse provides the document structure for sending
 	// a list of messages
 	MessageResponse struct {
-		Messages []string
+		Messages []string `json:"messages"`
 	}
 )
 
