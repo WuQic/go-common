@@ -24,6 +24,8 @@ var (
 
 // Init initializes the local environment
 func Init(defaultLocale string) error {
+	tracelog.STARTEDf("localize", "Init", "DefaultLocal[%s]", defaultLocale)
+
 	switch defaultLocale {
 	default:
 		LoadJSON(defaultLocale, loc.En_US)
@@ -36,6 +38,7 @@ func Init(defaultLocale string) error {
 		return err
 	}
 
+	tracelog.COMPLETED("localize", "Init")
 	return nil
 }
 
@@ -53,10 +56,12 @@ func CreateTranslationFunction(userLocale string, defaultLocale string) (t i18n.
 // LoadTransactionDocument takes a json document of translations and manually
 // loads them into the system
 func LoadJSON(userLocale string, translationDocument string) error {
+	tracelog.STARTEDf("localize", "LoadJSON", "UserLocale[%s] Length[%d]", userLocale, len(translationDocument))
+
 	tranDocuments := []map[string]interface{}{}
 	err := json.Unmarshal([]byte(translationDocument), &tranDocuments)
 	if err != nil {
-		tracelog.COMPLETED_ERROR(err, "localize", "LoadJSON")
+		tracelog.COMPLETED_ERRORf(err, "localize", "LoadJSON", "**************>")
 		return err
 	}
 
@@ -70,6 +75,7 @@ func LoadJSON(userLocale string, translationDocument string) error {
 		i18n.AddTranslation(locale.MustNew(userLocale), tran)
 	}
 
+	tracelog.COMPLETED("localize", "LoadJSON")
 	return nil
 }
 
