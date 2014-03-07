@@ -30,9 +30,9 @@ func Init(defaultLocale string) error {
 		LoadJSON(defaultLocale, loc.En_US)
 	}
 
-	// Create the default translation function for use
+	// Obtain the default translation function for use
 	var err error
-	T, err = CreateTranslationFunction(defaultLocale, defaultLocale)
+	T, err = NewTranslation(defaultLocale, defaultLocale)
 	if err != nil {
 		return err
 	}
@@ -41,9 +41,9 @@ func Init(defaultLocale string) error {
 	return nil
 }
 
-// CreateTranslationFunction creates a translation function object for the
+// NewTranslation obtains a translation function object for the
 // specified locales
-func CreateTranslationFunction(userLocale string, defaultLocale string) (t i18n.TranslateFunc, err error) {
+func NewTranslation(userLocale string, defaultLocale string) (t i18n.TranslateFunc, err error) {
 	t, err = i18n.Tfunc(userLocale, userLocale)
 	if err != nil {
 		return t, err
