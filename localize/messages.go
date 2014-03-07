@@ -22,7 +22,7 @@ var (
 )
 
 // Init initializes the local environment
-func Init(defaultLocale string) error {
+func Init(defaultLocale string) (err error) {
 	tracelog.STARTEDf("localize", "Init", "DefaultLocal[%s]", defaultLocale)
 
 	switch defaultLocale {
@@ -31,14 +31,13 @@ func Init(defaultLocale string) error {
 	}
 
 	// Obtain the default translation function for use
-	var err error
 	T, err = NewTranslation(defaultLocale, defaultLocale)
 	if err != nil {
 		return err
 	}
 
 	tracelog.COMPLETED("localize", "Init")
-	return nil
+	return err
 }
 
 // NewTranslation obtains a translation function object for the
