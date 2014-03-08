@@ -216,3 +216,10 @@ func (baseController *BaseController) CatchPanic(err *error, UUID string, functi
 		baseController.ServeAppError()
 	}
 }
+
+// CatchPanicNoErr is used to stop and process panics before they reach the Go runtime
+func (baseController *BaseController) CatchPanicNoErr(UUID string, functionName string) {
+	if helper.CatchPanic(nil, UUID, functionName) {
+		baseController.ServeAppError()
+	}
+}
