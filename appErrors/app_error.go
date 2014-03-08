@@ -28,17 +28,17 @@ type (
 )
 
 // Error returns the error message that is associated with the AppError object
-func (this *AppError) Error() string {
-	return this.ErrorMsg
+func (appError *AppError) Error() string {
+	return appError.ErrorMsg
 }
 
 // ErrorCode returns the error code that is associated with the AppError object
-func (this *AppError) ErrorCode() int {
-	if this.Code == 0 {
+func (appError *AppError) ErrorCode() int {
+	if appError.Code == 0 {
 		return APP_ERROR_CODE
 	}
 
-	return this.Code
+	return appError.Code
 }
 
 // NewError creates an AppError object

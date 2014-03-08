@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	_This *mongoManager // Reference to the singleton
+	singleton *mongoManager // Reference to the singleton
 )
 
 type (
@@ -55,7 +55,7 @@ func Startup(sessionId string) (err error) {
 	defer helper.CatchPanic(&err, sessionId, "Startup")
 
 	// If the system has already been started ignore the call
-	if _This != nil {
+	if singleton != nil {
 		return err
 	}
 
@@ -70,7 +70,7 @@ func Startup(sessionId string) (err error) {
 	}
 
 	// Create the Mongo Manager
-	_This = &mongoManager{
+	singleton = &mongoManager{
 		sessions: map[string]*mongoSession{},
 	}
 
@@ -96,7 +96,7 @@ func Shutdown(sessionId string) (err error) {
 	tracelog.STARTED(sessionId, "Shutdown")
 
 	// Close the databases
-	for _, session := range _This.sessions {
+	for _, session := range singleton.sessions {
 		CloseSession(sessionId, session.mongoSession)
 	}
 
@@ -151,7 +151,7 @@ func CreateSession(sessionId string, mode string, sessionName string, hosts []st
 	mongoSession.mongoSession.SetSafe(&mgo.Safe{})
 
 	// Add the database to the map
-	_This.sessions[sessionName] = mongoSession
+	singleton.sessions[sessionName] = mongoSession
 
 	tracelog.COMPLETED(sessionId, "CreateSession")
 	return err
@@ -174,7 +174,7 @@ func CopySession(sessionId string, useSession string) (mongoSession *mgo.Session
 	tracelog.STARTEDf(sessionId, "CopySession", "UseSession[%s]", useSession)
 
 	// Find the session object
-	session := _This.sessions[useSession]
+	session := singleton.sessions[useSession]
 
 	if session == nil {
 		err = fmt.Errorf("Unable To Locate Session %s", useSession)
@@ -206,7 +206,7 @@ func CloneSession(sessionId string, useSession string) (mongoSession *mgo.Sessio
 	tracelog.STARTEDf(sessionId, "CloneSession", "UseSession[%s]", useSession)
 
 	// Find the session object
-	session := _This.sessions[useSession]
+	session := singleton.sessions[useSession]
 
 	if session == nil {
 		err = fmt.Errorf("Unable To Locate Session %s", useSession)

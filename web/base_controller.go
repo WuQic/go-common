@@ -32,57 +32,57 @@ const (
 )
 
 // CacheOutput outputs the cache control header for seconds passed in
-func (this *BaseController) CacheOutput(seconds int64) {
-	this.Ctx.Output.Header(CACHE_CONTROL_HEADER, fmt.Sprintf("private, must-revalidate, max-age=%d", seconds))
+func (baseController *BaseController) CacheOutput(seconds int64) {
+	baseController.Ctx.Output.Header(CACHE_CONTROL_HEADER, fmt.Sprintf("private, must-revalidate, max-age=%d", seconds))
 }
 
 // ServeBlankModel serves an empty key/value pair map as Json
-func (this *BaseController) ServeBlankModel() {
-	this.Data["json"] = map[string]string{}
-	this.ServeJson()
+func (baseController *BaseController) ServeBlankModel() {
+	baseController.Data["json"] = map[string]string{}
+	baseController.ServeJson()
 }
 
 // ServeBlankModelList serves an empty slice of key/value pair maps as Json
-func (this *BaseController) ServeBlankModelList() {
-	this.Data["json"] = []map[string]string{}
-	this.ServeJson()
+func (baseController *BaseController) ServeBlankModelList() {
+	baseController.Data["json"] = []map[string]string{}
+	baseController.ServeJson()
 }
 
 // ServeJsonModel marshals the specified object as JSON
-func (this *BaseController) ServeJsonModel(obj interface{}) {
-	this.ServeJsonWithCache(obj, 0)
+func (baseController *BaseController) ServeJsonModel(obj interface{}) {
+	baseController.ServeJsonWithCache(obj, 0)
 }
 
 // ServeJsonWithCache marshals the specified object as JSON specifying cache time
-func (this *BaseController) ServeJsonWithCache(obj interface{}, secondsToCache int64) {
+func (baseController *BaseController) ServeJsonWithCache(obj interface{}, secondsToCache int64) {
 	if secondsToCache > 0 {
-		this.CacheOutput(secondsToCache)
+		baseController.CacheOutput(secondsToCache)
 	}
 
-	this.Data["json"] = obj
-	this.ServeJson()
+	baseController.Data["json"] = obj
+	baseController.ServeJson()
 }
 
 // ServeUnAuthorized returns an Unauthorized error
-func (this *BaseController) ServeUnAuthorized() {
+func (baseController *BaseController) ServeUnAuthorized() {
 	tracelog.INFO("BaseController", "ServeUnAuthorized", "UnAuthorized, Exiting")
 
-	this.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, localize.T(appErrors.UNAUTHORIZED_ERROR_MSG))
+	baseController.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, localize.T(appErrors.UNAUTHORIZED_ERROR_MSG))
 }
 
 // ServeValidationError returns a Validation Error's list of messages with a validation err code
-func (this *BaseController) ServeValidationError() {
-	this.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
+func (baseController *BaseController) ServeValidationError() {
+	baseController.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
 	msgs := MessageResponse{}
 	msgs.Messages = []string{localize.T(appErrors.VALIDATION_ERROR_MSG)}
-	this.Data["json"] = &msgs
-	this.ServeJson()
+	baseController.Data["json"] = &msgs
+	baseController.ServeJson()
 }
 
 // ServeValidationErrors returns a Validation Error's list of messages with a validation err code
-func (this *BaseController) ServeValidationErrors(validationErrors []*validation.ValidationError) {
-	this.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
+func (baseController *BaseController) ServeValidationErrors(validationErrors []*validation.ValidationError) {
+	baseController.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
 	response := make([]string, len(validationErrors))
 	for index, validationError := range validationErrors {
@@ -91,83 +91,83 @@ func (this *BaseController) ServeValidationErrors(validationErrors []*validation
 
 	msgs := MessageResponse{}
 	msgs.Messages = response
-	this.Data["json"] = &msgs
-	this.ServeJson()
+	baseController.Data["json"] = &msgs
+	baseController.ServeJson()
 }
 
 // ServeError serves a error interface object
-func (this *BaseController) ServeError(err error) {
+func (baseController *BaseController) ServeError(err error) {
 	switch e := err.(type) {
 	case *appErrors.AppError:
 		if e.ErrorCode() != 0 {
-			this.ServeMessageWithStatus(e.ErrorCode(), e.Error())
+			baseController.ServeMessageWithStatus(e.ErrorCode(), e.Error())
 			break
 		}
 
-		this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, e.Error())
+		baseController.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, e.Error())
 
 	default:
 		// We want to always return a generic message when an application error exists
 		// We don't want to give the end user any information they could use against us
-		this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, localize.T(appErrors.APP_ERROR_MSG))
+		baseController.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, localize.T(appErrors.APP_ERROR_MSG))
 	}
 }
 
 // ServeLocalizedError serves a validation error based on the specified key for the
 // translated message
-func (this *BaseController) ServeLocalizedError(key string) {
-	this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(key))
+func (baseController *BaseController) ServeLocalizedError(key string) {
+	baseController.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(key))
 }
 
 // ServeAppError serves a generic application error
-func (this *BaseController) ServeAppError() {
-	this.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, localize.T(appErrors.APP_ERROR_MSG))
+func (baseController *BaseController) ServeAppError() {
+	baseController.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, localize.T(appErrors.APP_ERROR_MSG))
 }
 
 // ServeMessageWithStatus serves a HTTP status and message
-func (this *BaseController) ServeMessageWithStatus(status int, msg string) {
-	this.ServeMessagesWithStatus(status, []string{msg})
+func (baseController *BaseController) ServeMessageWithStatus(status int, msg string) {
+	baseController.ServeMessagesWithStatus(status, []string{msg})
 }
 
 // ServeMessageWithStatus serves a HTTP status and messages
-func (this *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
+func (baseController *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 	tracelog.INFO("BaseController", "ServeMessagesWithStatus", "Application Error, Exiting : %#v", msgs)
 
-	this.Ctx.Output.SetStatus(status)
+	baseController.Ctx.Output.SetStatus(status)
 	response := MessageResponse{Messages: msgs}
-	this.Data["json"] = &response
-	this.ServeJson()
+	baseController.Data["json"] = &response
+	baseController.ServeJson()
 }
 
 // ParseAndValidateJson is used to parse json into a type from the request and validate the values
-func (this *BaseController) ParseAndValidateJson(obj interface{}) bool {
-	decoder := json.NewDecoder(this.Ctx.Request.Body)
+func (baseController *BaseController) ParseAndValidateJson(obj interface{}) bool {
+	decoder := json.NewDecoder(baseController.Ctx.Request.Body)
 	err := decoder.Decode(obj)
 	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
+		baseController.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 
-	return this.Validate(obj)
+	return baseController.Validate(obj)
 }
 
 // ParseAndValidate is used to parse any form and query parameters from the request and validate the values
-func (this *BaseController) ParseAndValidate(obj interface{}) bool {
-	err := this.ParseForm(obj)
+func (baseController *BaseController) ParseAndValidate(obj interface{}) bool {
+	err := baseController.ParseForm(obj)
 	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
+		baseController.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 
-	return this.Validate(obj)
+	return baseController.Validate(obj)
 }
 
 // Validate validates a type against the valid tags in the type
-func (this *BaseController) Validate(params interface{}) bool {
+func (baseController *BaseController) Validate(params interface{}) bool {
 	valid := validation.Validation{}
 	ok, err := valid.Valid(params)
 	if err != nil {
-		this.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
+		baseController.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(appErrors.VALIDATION_ERROR_MSG))
 		return false
 	}
 
@@ -203,7 +203,7 @@ func (this *BaseController) Validate(params interface{}) bool {
 			errors = append(errors, err.Message)
 		}
 
-		this.ServeMessagesWithStatus(appErrors.VALIDATION_ERROR_CODE, errors)
+		baseController.ServeMessagesWithStatus(appErrors.VALIDATION_ERROR_CODE, errors)
 		return false
 	}
 
@@ -211,8 +211,8 @@ func (this *BaseController) Validate(params interface{}) bool {
 }
 
 // CatchPanic is used to stop and process panics before they reach the Go runtime
-func (this *BaseController) CatchPanic(err *error, UUID string, functionName string) {
+func (baseController *BaseController) CatchPanic(err *error, UUID string, functionName string) {
 	if helper.CatchPanic(err, UUID, functionName) {
-		this.ServeAppError()
+		baseController.ServeAppError()
 	}
 }
