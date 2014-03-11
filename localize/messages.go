@@ -32,7 +32,7 @@ func Init(defaultLocale string) error {
 
 	// Obtain the default translation function for use
 	var err error
-	T, err = NewTranslation(defaultLocale, defaultLocale)
+	T, err = NewTranslation(defaultLocale)
 	if err != nil {
 		return err
 	}
@@ -43,8 +43,8 @@ func Init(defaultLocale string) error {
 
 // NewTranslation obtains a translation function object for the
 // specified locales
-func NewTranslation(userLocale string, defaultLocale string) (t i18n.TranslateFunc, err error) {
-	t, err = i18n.Tfunc(userLocale, userLocale)
+func NewTranslation(userLocale string) (t i18n.TranslateFunc, err error) {
+	t, err = i18n.Tfunc(userLocale)
 	if err != nil {
 		return t, err
 	}
