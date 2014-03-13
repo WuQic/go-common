@@ -1,4 +1,4 @@
-// The Web package provides common functionality for all controllers
+// The Web package provides common functionality for all controllers.
 package web
 
 import (
@@ -15,12 +15,12 @@ import (
 )
 
 type (
-	// BaseController provides access to common controller
+	// BaseController provides access to common controller.
 	BaseController struct {
 		beego.Controller
 	}
 
-	// MessageResponse provides the document structure for sending
+	// MessageResponse provides the document structure for sending.
 	// a list of messages
 	MessageResponse struct {
 		Messages []string `json:"messages"`
@@ -31,29 +31,29 @@ const (
 	CACHE_CONTROL_HEADER = "Cache-control"
 )
 
-// CacheOutput outputs the cache control header for seconds passed in
+// CacheOutput outputs the cache control header for seconds passed in.
 func (baseController *BaseController) CacheOutput(seconds int64) {
 	baseController.Ctx.Output.Header(CACHE_CONTROL_HEADER, fmt.Sprintf("private, must-revalidate, max-age=%d", seconds))
 }
 
-// ServeBlankModel serves an empty key/value pair map as Json
+// ServeBlankModel serves an empty key/value pair map as Json.
 func (baseController *BaseController) ServeBlankModel() {
 	baseController.Data["json"] = map[string]string{}
 	baseController.ServeJson()
 }
 
-// ServeBlankModelList serves an empty slice of key/value pair maps as Json
+// ServeBlankModelList serves an empty slice of key/value pair maps as Json.
 func (baseController *BaseController) ServeBlankModelList() {
 	baseController.Data["json"] = []map[string]string{}
 	baseController.ServeJson()
 }
 
-// ServeJsonModel marshals the specified object as JSON
+// ServeJsonModel marshals the specified object as JSON.
 func (baseController *BaseController) ServeJsonModel(obj interface{}) {
 	baseController.ServeJsonWithCache(obj, 0)
 }
 
-// ServeJsonWithCache marshals the specified object as JSON specifying cache time
+// ServeJsonWithCache marshals the specified object as JSON specifying cache time.
 func (baseController *BaseController) ServeJsonWithCache(obj interface{}, secondsToCache int64) {
 	if secondsToCache > 0 {
 		baseController.CacheOutput(secondsToCache)
@@ -63,14 +63,21 @@ func (baseController *BaseController) ServeJsonWithCache(obj interface{}, second
 	baseController.ServeJson()
 }
 
-// ServeUnAuthorized returns an Unauthorized error
+// ServeImage serves an image with the specified mime type.
+func (baseController *BaseController) ServeImage(image []byte, mimeType string) {
+	baseController.Ctx.Output.SetStatus(200)
+	baseController.Ctx.Output.ContentType("image/" + mimeType)
+	baseController.Ctx.Output.Body([]byte{})
+}
+
+// ServeUnAuthorized returns an Unauthorized error.
 func (baseController *BaseController) ServeUnAuthorized() {
 	tracelog.INFO("BaseController", "ServeUnAuthorized", "UnAuthorized, Exiting")
 
 	baseController.ServeMessageWithStatus(appErrors.UNAUTHORIZED_ERROR_CODE, localize.T(appErrors.UNAUTHORIZED_ERROR_MSG))
 }
 
-// ServeValidationError returns a Validation Error's list of messages with a validation err code
+// ServeValidationError returns a Validation Error's list of messages with a validation err code.
 func (baseController *BaseController) ServeValidationError() {
 	baseController.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
@@ -80,7 +87,7 @@ func (baseController *BaseController) ServeValidationError() {
 	baseController.ServeJson()
 }
 
-// ServeValidationErrors returns a Validation Error's list of messages with a validation err code
+// ServeValidationErrors returns a Validation Error's list of messages with a validation err code.
 func (baseController *BaseController) ServeValidationErrors(validationErrors []*validation.ValidationError) {
 	baseController.Ctx.Output.SetStatus(appErrors.VALIDATION_ERROR_CODE)
 
@@ -95,7 +102,7 @@ func (baseController *BaseController) ServeValidationErrors(validationErrors []*
 	baseController.ServeJson()
 }
 
-// ServeError serves a error interface object
+// ServeError serves a error interface object.
 func (baseController *BaseController) ServeError(err error) {
 	switch e := err.(type) {
 	case *appErrors.AppError:
@@ -114,22 +121,22 @@ func (baseController *BaseController) ServeError(err error) {
 }
 
 // ServeLocalizedError serves a validation error based on the specified key for the
-// translated message
+// translated message.
 func (baseController *BaseController) ServeLocalizedError(key string) {
 	baseController.ServeMessageWithStatus(appErrors.VALIDATION_ERROR_CODE, localize.T(key))
 }
 
-// ServeAppError serves a generic application error
+// ServeAppError serves a generic application error.
 func (baseController *BaseController) ServeAppError() {
 	baseController.ServeMessageWithStatus(appErrors.APP_ERROR_CODE, localize.T(appErrors.APP_ERROR_MSG))
 }
 
-// ServeMessageWithStatus serves a HTTP status and message
+// ServeMessageWithStatus serves a HTTP status and message.
 func (baseController *BaseController) ServeMessageWithStatus(status int, msg string) {
 	baseController.ServeMessagesWithStatus(status, []string{msg})
 }
 
-// ServeMessageWithStatus serves a HTTP status and messages
+// ServeMessageWithStatus serves a HTTP status and messages.
 func (baseController *BaseController) ServeMessagesWithStatus(status int, msgs []string) {
 	tracelog.INFO("BaseController", "ServeMessagesWithStatus", "Application Error, Exiting : %#v", msgs)
 
@@ -139,7 +146,7 @@ func (baseController *BaseController) ServeMessagesWithStatus(status int, msgs [
 	baseController.ServeJson()
 }
 
-// ParseAndValidateJson is used to parse json into a type from the request and validate the values
+// ParseAndValidateJson is used to parse json into a type from the request and validate the values.
 func (baseController *BaseController) ParseAndValidateJson(obj interface{}) bool {
 	decoder := json.NewDecoder(baseController.Ctx.Request.Body)
 	err := decoder.Decode(obj)
@@ -151,7 +158,7 @@ func (baseController *BaseController) ParseAndValidateJson(obj interface{}) bool
 	return baseController.Validate(obj)
 }
 
-// ParseAndValidate is used to parse any form and query parameters from the request and validate the values
+// ParseAndValidate is used to parse any form and query parameters from the request and validate the values.
 func (baseController *BaseController) ParseAndValidate(obj interface{}) bool {
 	err := baseController.ParseForm(obj)
 	if err != nil {
@@ -162,7 +169,7 @@ func (baseController *BaseController) ParseAndValidate(obj interface{}) bool {
 	return baseController.Validate(obj)
 }
 
-// Validate validates a type against the valid tags in the type
+// Validate validates a type against the valid tags in the type.
 func (baseController *BaseController) Validate(params interface{}) bool {
 	valid := validation.Validation{}
 	ok, err := valid.Valid(params)
@@ -210,14 +217,14 @@ func (baseController *BaseController) Validate(params interface{}) bool {
 	return true
 }
 
-// CatchPanic is used to stop and process panics before they reach the Go runtime
+// CatchPanic is used to stop and process panics before they reach the Go runtime.
 func (baseController *BaseController) CatchPanic(err *error, UUID string, functionName string) {
 	if helper.CatchPanic(err, UUID, functionName) {
 		baseController.ServeAppError()
 	}
 }
 
-// CatchPanicNoErr is used to stop and process panics before they reach the Go runtime
+// CatchPanicNoErr is used to stop and process panics before they reach the Go runtime.
 func (baseController *BaseController) CatchPanicNoErr(UUID string, functionName string) {
 	if helper.CatchPanic(nil, UUID, functionName) {
 		baseController.ServeAppError()
