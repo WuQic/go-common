@@ -31,6 +31,16 @@ func MergeUrlValues(target *url.Values, source url.Values) {
 	}
 }
 
+// ToUrlValues merges a string map to url.Values
+func ToUrlValues(source map[string]string) url.Values {
+	values := url.Values{}
+	for k, v := range source {
+		values.Add(k, v)
+	}
+
+	return values
+}
+
 // CatchPanic is used to catch any Panic and log exceptions to Stdout.
 // It will also write the stack trace
 func CatchPanic(err *error, goRoutine string, functionName string) bool {
