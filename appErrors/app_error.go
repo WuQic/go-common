@@ -16,6 +16,9 @@ const (
 	APP_ERROR_CODE = 500
 
 	CACHE_CONTROL_HEADER = "Cache-control"
+
+	NETWORK_READ_ERROR_CODE = 598
+	NETWORK_READ_ERROR_MSG  = "network_read_error"
 )
 
 type (

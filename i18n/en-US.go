@@ -12,5 +12,9 @@ var En_US = `[
 	{
 		"id": "application_error",
 		"translation": "an application error has occured."
+	},
+	{
+		"id": "network_read_error",
+		"translation": "a communication error has occured."
 	}
 ]`
