@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 
@@ -93,27 +94,54 @@ func NewTransport(proxy ProxyFunc) *Transport {
 	}
 }
 
-// Get implements an http get with timeouts.
-func (t *Transport) Get(url string) (resp *http.Response, err error) {
-	client := &http.Client{Transport: t}
-	req, _ := http.NewRequest("GET", url, nil)
+// Get implements a get request.
+func (t *Transport) Get(url string) ([]byte, error) {
+	return t.GetWithHeaders(url, nil)
+}
 
-	resp, err = client.Do(req)
+// Get performs a Get request with the specified headers.
+func (t *Transport) GetWithHeaders(url string, headers map[string]string) ([]byte, error) {
+	client := &http.Client{Transport: t}
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return resp, err
+		tracelog.ERROR(err, "http_client", "GetWithHeaders")
+		return nil, err
 	}
 
-	return resp, err
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return loadResponse(resp)
 }
 
 // Post performs a post request.
 func (t *Transport) Post(url string, postParams url.Values) ([]byte, error) {
-	tracelog.STARTEDf("http_client", "Post", "Url => %s, Post Params => %v", url, postParams)
+	return t.PostWithHeaders(url, postParams, nil)
+}
 
+// Post performs a post request with the specified headers.
+func (t *Transport) PostWithHeaders(url string, postParams url.Values, headers map[string]string) ([]byte, error) {
 	client := &http.Client{Transport: t}
-	resp, err := client.PostForm(url, postParams)
-
+	req, err := http.NewRequest("POST", url, strings.NewReader(postParams.Encode()))
 	if err != nil {
+		tracelog.ERROR(err, "http_client", "PostWithHeaders")
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		tracelog.ERROR(err, "http_client", "PostWithHeaders")
 		return nil, err
 	}
 
@@ -137,6 +165,7 @@ func loadResponse(resp *http.Response) ([]byte, error) {
 		return nil, errors.New(string(contents))
 	}
 
+	tracelog.COMPLETED("http_client", "loadResponse")
 	return contents, err
 }
 
