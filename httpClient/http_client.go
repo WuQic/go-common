@@ -91,6 +91,7 @@ func NewTransport(proxy ProxyFunc) *Transport {
 		ResponseHeaderTimeout: 60 * time.Second,
 		RequestTimeout:        85 * time.Second,
 		Proxy:                 proxy,
+		DisableCompression:    false,
 	}
 }
 
