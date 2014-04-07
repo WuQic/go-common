@@ -204,10 +204,10 @@ func (baseController *BaseController) Validate(params interface{}) bool {
 				// Use a localized message if one exists
 				errors = append(errors, localize.T(message))
 				continue
+			} else {
+				// No match, so use the message as is, Formats the err msg to include the key (field name).
+				errors = append(errors, fmt.Sprintf("%s %s", err.Field, err.Message))
 			}
-
-			// No match, so use the message as is
-			errors = append(errors, err.Message)
 		}
 
 		baseController.ServeMessagesWithStatus(appErrors.VALIDATION_ERROR_CODE, errors)
